@@ -69,7 +69,35 @@ def main():
 
     if '-p' in parameters:
         page = int(parameters["-p"])
-        content_on_page = core.page_paragraphs(page, reader.load_page(page).get_text())
+        # content_on_page = core.page_paragraphs(page, reader.load_page(page).get_text())
+
+    if '-b' in parameters:
+        if len(chapters) == 0:
+            print("No table of contents provided, please specify where to find it with the -c tag.")
+            return
+        
+        chapter = parameters["-b"]
+        chapter_index = chapters.get(chapter)
+        
+        if chapter_index is None:
+            print(f"Chapter '{chapter}' not found in table of contents.")
+            return
+
+        # Initialize content as an empty string
+        content = ""
+        
+        # Retrieve text for the specified chapter and surrounding pages, checking bounds
+        for offset in [-1, 0, 1]:
+            page_index = chapter_index + offset
+            if 0 <= page_index < len(reader):
+                content += reader.load_page(page_index).get_text()
+            else:
+                print(f"Warning: Page {page_index} is out of bounds and will be skipped.")
+
+        # print(content)
+        # Pass the combined content to the function
+        paragraph = core.chapters_paragraphs(chapter, chapters, content.lower())
+        print(paragraph)
 
 if __name__ == "__main__":
     main()

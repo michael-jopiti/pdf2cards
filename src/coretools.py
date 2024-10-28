@@ -13,20 +13,33 @@ def search_chapters(page, text):
     # create a dictionary:
     # keys: chapters' name
     # values: page number
-    chapters = {text[i]: int(text[i + 1]) for i in range(0, len(text), 2)}
+    #
+    # + page + 1 is to correct for shifting due to pages before the actual content
+    chapters = {text[i].lower(): int(text[i + 1]) + (int(page) + 1) for i in range(0, len(text), 2)}
 
     for chapter, page in chapters.items():
         print(f"Chapter: {chapter} \n\tat page: {page}")
 
     return chapters
 
+def chapters_paragraphs(chapter, chapters, text):
+    ''' Retrieve body of given chapter, knowing which is the next one'''
 
-def page_paragraphs(page, text):
-    ''' retrieves all the paragraphs in a page '''
-    # Remove first element as it's the page number
-    text = remove_whitelines(text)[1:]
+    # print(text)
 
-    # TODO
-    # Retrieve the entire content of each chapter given it's successor (from dictionary)
+    # to get next chapter, convert dictionary to list and get next element
+    chapters_list = list(chapters)
+    keys = list(chapters.keys())
 
-    print(text)
+    # Find the next key
+    try:
+        current_index = keys.index(chapter)
+        next_key = keys[current_index + 1]
+    except (ValueError, IndexError):
+        print("Current key is the last one or not found.")
+    
+    print(f"Target: {chapter}\tNext: {next_key}")
+    start_paragraph = text.index(chapter.lower())
+    end_paragraph = text.index(next_key.lower())
+
+    return text[start_paragraph:end_paragraph]
